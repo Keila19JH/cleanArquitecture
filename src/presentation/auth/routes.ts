@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { AuthController } from "./controller";
 import { AuthDatasourceImpl } from "../../infrastruture/datasources/auth.datasource.impl";
 import { AuthRepositoryImpl } from "../../infrastruture/repositories/auth.repository.impl";
+import { AuthMiddleware } from "../middlewares/auth.middleware";
 
 
 export class AuthRoutes {
@@ -16,17 +17,13 @@ export class AuthRoutes {
 
         router.post('/login', controller.loginUser );
 
-        router.post('/register', (req: Request, res: Response) => {
-            res.json({
-                msg: 'usuario registrado correctamente'
-            })
-        });
+        router.post('/register', controller.registerUser);
 
-        router.get('/renew', (req: Request, res: Response) => {
-            res.json({
-                msg: 'usuario renovado correctamente'
-            })
-        });
+        router.get(
+            '/renew',
+            [ AuthMiddleware.validateJWT ], 
+            controller.renew
+        );
 
         return router;
     }
